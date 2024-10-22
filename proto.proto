@@ -3,9 +3,8 @@ syntax = "proto3";
 option go_package = "grpc/";
 
 message Message {
-    string participant_name = 1;  // Name of the participant sending the message
-    string message = 2;           // The chat message content (max 128 characters)
-    int64 lamport_time = 3;       // The Lamport timestamp of the message
+    string message = 1;
+    int64 lamport_time = 2;
 }
 
 message Empty {}
