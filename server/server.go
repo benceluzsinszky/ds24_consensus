@@ -35,9 +35,10 @@ func (s *ChittyChat) Chat(stream proto.ChittyChat_ChatServer) error {
 	newClientId := s.clientId
 	s.clientId++
 	s.clients[newClientId] = stream
+	s.lamport++
 	s.mu.Unlock()
 
-	joinMessage := fmt.Sprintf("Participant %d joined Chitty-Chat at Lamport time %d", newClientId, s.lamport)
+	joinMessage := fmt.Sprintf("(C%d, %d) Client %d joined Chitty-Chat", newClientId, s.lamport, newClientId)
 	log.Println(joinMessage)
 	s.broadcast(joinMessage)
 
@@ -46,7 +47,7 @@ func (s *ChittyChat) Chat(stream proto.ChittyChat_ChatServer) error {
 		delete(s.clients, newClientId)
 		s.mu.Unlock()
 
-		leaveMessage := fmt.Sprintf("Participant %d left Chitty-Chat at Lamport time %d", newClientId, s.lamport)
+		leaveMessage := fmt.Sprintf("(C%d, %d) Client %d left Chitty-Chat", newClientId, s.lamport, newClientId)
 		log.Println(leaveMessage)
 		s.broadcast(leaveMessage)
 	}()
@@ -62,7 +63,7 @@ func (s *ChittyChat) Chat(stream proto.ChittyChat_ChatServer) error {
 
 		s.mu.Lock()
 		s.lamport = max(s.lamport, in.LamportTime) + 1
-		message := fmt.Sprintf("(Lamport Time %d) Client %d: %s ", s.lamport, newClientId, in.Message)
+		message := fmt.Sprintf("(C%d, %d) Client %d: %s ", newClientId, s.lamport, newClientId, in.Message)
 		s.mu.Unlock()
 
 		log.Println(message)
