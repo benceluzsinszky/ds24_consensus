@@ -13,7 +13,6 @@ import (
 
 type ChittyChat struct {
 	proto.UnimplementedChittyChatServer
-	messages []string
 	clientId int
 	lamport  int64
 	clients  map[int]proto.ChittyChat_ChatServer
@@ -38,13 +37,18 @@ func (s *ChittyChat) Chat(stream proto.ChittyChat_ChatServer) error {
 	s.clients[newClientId] = stream
 	s.mu.Unlock()
 
-	s.broadcast(fmt.Sprintf("Participant %d joined Chitty-Chat at Lamport time %d", newClientId, s.lamport))
+	joinMessage := fmt.Sprintf("Participant %d joined Chitty-Chat at Lamport time %d", newClientId, s.lamport)
+	log.Println(joinMessage)
+	s.broadcast(joinMessage)
 
 	defer func() {
 		s.mu.Lock()
 		delete(s.clients, newClientId)
 		s.mu.Unlock()
-		s.broadcast(fmt.Sprintf("Participant %d left Chitty-Chat at Lamport time %d", newClientId, s.lamport))
+
+		leaveMessage := fmt.Sprintf("Participant %d left Chitty-Chat at Lamport time %d", newClientId, s.lamport)
+		log.Println(leaveMessage)
+		s.broadcast(leaveMessage)
 	}()
 
 	for {
@@ -58,17 +62,11 @@ func (s *ChittyChat) Chat(stream proto.ChittyChat_ChatServer) error {
 
 		s.mu.Lock()
 		s.lamport = max(s.lamport, in.LamportTime) + 1
-		savedMessage := fmt.Sprintf("Client %d: %s at Lamport Time %d", newClientId, in.Message, s.lamport)
-		s.messages = append(s.messages, savedMessage)
+		message := fmt.Sprintf("(Lamport Time %d) Client %d: %s ", s.lamport, newClientId, in.Message)
 		s.mu.Unlock()
 
-		// bigMessage := ""
-		// for _, msg := range s.messages {
-		// 	bigMessage += msg + "\n"
-		// }
-
-		// s.broadcast(bigMessage)
-		s.broadcast(savedMessage)
+		log.Println(message)
+		s.broadcast(message)
 	}
 
 }
