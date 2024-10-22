@@ -15,6 +15,6 @@ message AllMessages {
 message Empty {}
 
 service ChittyChat {
-    rpc Chat(stream Message) returns (stream AllMessages) {}
+    rpc Chat(stream Message) returns (stream Message) {}
     rpc SendMessage(Message) returns (Message) {}
 }
