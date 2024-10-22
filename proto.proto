@@ -8,13 +8,8 @@ message Message {
     int64 lamport_time = 3;       // The Lamport timestamp of the message
 }
 
-message AllMessages {
-    repeated string allMessages = 1;
-}
-
 message Empty {}
 
 service ChittyChat {
     rpc Chat(stream Message) returns (stream Message) {}
-    rpc SendMessage(Message) returns (Message) {}
 }

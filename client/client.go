@@ -13,16 +13,15 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
+func isMessageValid(message string) bool {
+	return len(message) < 128
+}
+
 func main() {
 
-	// var opts []grpc.DialOption
-	// conn, err := grpc.NewClient(*serverAddr,
-	// if err != nil {
-	// 	log.Fatalf("Failed to connect: %v", err)
-	// }
-	// defer conn.Close()
+	lamport := 0
 
-	conn, err := grpc.Dial("localhost:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial("0.0.0.0:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect: %v", err)
 	}
@@ -35,11 +34,15 @@ func main() {
 		log.Fatalf("Failed to create stream: %v", err)
 	}
 
-	// Goroutine to send messages
 	go func() {
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {
-			if err := stream.Send(&proto.Message{Message: scanner.Text()}); err != nil {
+			if !isMessageValid(scanner.Text()) {
+				fmt.Println("Message is too long, please keep it under 128 characters")
+				continue
+			}
+			lamport++
+			if err := stream.Send(&proto.Message{Message: scanner.Text(), LamportTime: int64(lamport)}); err != nil {
 				log.Fatalf("Failed to send message: %v", err)
 			}
 		}
@@ -48,7 +51,6 @@ func main() {
 		}
 	}()
 
-	// Receiving messages
 	for {
 		reply, err := stream.Recv()
 		if err != nil {
@@ -57,21 +59,8 @@ func main() {
 			}
 			log.Fatalf("Failed to receive message: %v", err)
 		}
-		fmt.Println("Received:", reply.Message)
+		lamport = max(lamport, int(reply.LamportTime)) + 1
+
+		log.Println(reply.Message)
 	}
 }
-
-// stream, err := client.RecordRoute(context.Background())
-// if err != nil {
-//   log.Fatalf("%v.RecordRoute(_) = _, %v", client, err)
-// }
-// for _, point := range points {
-//   if err := stream.Send(point); err != nil {
-//     log.Fatalf("%v.Send(%v) = %v", stream, point, err)
-//   }
-// }
-// reply, err := stream.CloseAndRecv()
-// if err != nil {
-//   log.Fatalf("%v.CloseAndRecv() got error %v, want %v", stream, err, nil)
-// }
-// log.Printf("Route summary: %v", reply)
