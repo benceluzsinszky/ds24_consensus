@@ -4,7 +4,6 @@ import (
 	proto "Chittychat/grpc"
 	"bufio"
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -21,7 +20,7 @@ func main() {
 
 	lamport := 0
 
-	conn, err := grpc.Dial("0.0.0.0:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("0.0.0.0:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatalf("Failed to connect: %v", err)
 	}
@@ -38,7 +37,7 @@ func main() {
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {
 			if !isMessageValid(scanner.Text()) {
-				fmt.Println("Message is too long, please keep it under 128 characters")
+				log.Println("Message is too long, please keep it under 128 characters")
 				continue
 			}
 			lamport++
