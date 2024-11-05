@@ -19,27 +19,27 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ChittyChat_Chat_FullMethodName = "/ChittyChat/Chat"
+	Bully_Chat_FullMethodName = "/Bully/Chat"
 )
 
-// ChittyChatClient is the client API for ChittyChat service.
+// BullyClient is the client API for Bully service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ChittyChatClient interface {
+type BullyClient interface {
 	Chat(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Message, Message], error)
 }
 
-type chittyChatClient struct {
+type bullyClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewChittyChatClient(cc grpc.ClientConnInterface) ChittyChatClient {
-	return &chittyChatClient{cc}
+func NewBullyClient(cc grpc.ClientConnInterface) BullyClient {
+	return &bullyClient{cc}
 }
 
-func (c *chittyChatClient) Chat(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Message, Message], error) {
+func (c *bullyClient) Chat(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[Message, Message], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	stream, err := c.cc.NewStream(ctx, &ChittyChat_ServiceDesc.Streams[0], ChittyChat_Chat_FullMethodName, cOpts...)
+	stream, err := c.cc.NewStream(ctx, &Bully_ServiceDesc.Streams[0], Bully_Chat_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -48,65 +48,65 @@ func (c *chittyChatClient) Chat(ctx context.Context, opts ...grpc.CallOption) (g
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type ChittyChat_ChatClient = grpc.BidiStreamingClient[Message, Message]
+type Bully_ChatClient = grpc.BidiStreamingClient[Message, Message]
 
-// ChittyChatServer is the server API for ChittyChat service.
-// All implementations must embed UnimplementedChittyChatServer
+// BullyServer is the server API for Bully service.
+// All implementations must embed UnimplementedBullyServer
 // for forward compatibility.
-type ChittyChatServer interface {
+type BullyServer interface {
 	Chat(grpc.BidiStreamingServer[Message, Message]) error
-	mustEmbedUnimplementedChittyChatServer()
+	mustEmbedUnimplementedBullyServer()
 }
 
-// UnimplementedChittyChatServer must be embedded to have
+// UnimplementedBullyServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedChittyChatServer struct{}
+type UnimplementedBullyServer struct{}
 
-func (UnimplementedChittyChatServer) Chat(grpc.BidiStreamingServer[Message, Message]) error {
+func (UnimplementedBullyServer) Chat(grpc.BidiStreamingServer[Message, Message]) error {
 	return status.Errorf(codes.Unimplemented, "method Chat not implemented")
 }
-func (UnimplementedChittyChatServer) mustEmbedUnimplementedChittyChatServer() {}
-func (UnimplementedChittyChatServer) testEmbeddedByValue()                    {}
+func (UnimplementedBullyServer) mustEmbedUnimplementedBullyServer() {}
+func (UnimplementedBullyServer) testEmbeddedByValue()               {}
 
-// UnsafeChittyChatServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ChittyChatServer will
+// UnsafeBullyServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to BullyServer will
 // result in compilation errors.
-type UnsafeChittyChatServer interface {
-	mustEmbedUnimplementedChittyChatServer()
+type UnsafeBullyServer interface {
+	mustEmbedUnimplementedBullyServer()
 }
 
-func RegisterChittyChatServer(s grpc.ServiceRegistrar, srv ChittyChatServer) {
-	// If the following call pancis, it indicates UnimplementedChittyChatServer was
+func RegisterBullyServer(s grpc.ServiceRegistrar, srv BullyServer) {
+	// If the following call pancis, it indicates UnimplementedBullyServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&ChittyChat_ServiceDesc, srv)
+	s.RegisterService(&Bully_ServiceDesc, srv)
 }
 
-func _ChittyChat_Chat_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ChittyChatServer).Chat(&grpc.GenericServerStream[Message, Message]{ServerStream: stream})
+func _Bully_Chat_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(BullyServer).Chat(&grpc.GenericServerStream[Message, Message]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type ChittyChat_ChatServer = grpc.BidiStreamingServer[Message, Message]
+type Bully_ChatServer = grpc.BidiStreamingServer[Message, Message]
 
-// ChittyChat_ServiceDesc is the grpc.ServiceDesc for ChittyChat service.
+// Bully_ServiceDesc is the grpc.ServiceDesc for Bully service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ChittyChat_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ChittyChat",
-	HandlerType: (*ChittyChatServer)(nil),
+var Bully_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "Bully",
+	HandlerType: (*BullyServer)(nil),
 	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "Chat",
-			Handler:       _ChittyChat_Chat_Handler,
+			Handler:       _Bully_Chat_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},

@@ -4,11 +4,10 @@ option go_package = "grpc/";
 
 message Message {
     string message = 1;
-    int64 lamport_time = 2;
 }
 
 message Empty {}
 
-service ChittyChat {
+service Bully {
     rpc Chat(stream Message) returns (stream Message) {}
 }
