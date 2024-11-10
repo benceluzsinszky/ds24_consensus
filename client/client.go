@@ -26,7 +26,7 @@ func main() {
 		log.Fatalf("Failed to connect: %v", err)
 	}
 	defer conn.Close()
-
+	// NewBullyClient is the client API for Bully service.
 	client := proto.NewBullyClient(conn)
 
 	stream, err := client.Chat(context.Background())
@@ -83,6 +83,7 @@ func main() {
 
 }
 
+// This function is responsible for determining the bully (leader) among the nodes.
 func bully(stream proto.Bully_ChatClient, nodeId int, bullyId *int) {
 	// trigger coordination on all other nodes
 	message := "coordinate(" + strconv.Itoa(nodeId) + ")"

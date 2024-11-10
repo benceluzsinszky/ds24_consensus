@@ -27,10 +27,12 @@ func (s *Bully) broadcast(message string) {
 	}
 }
 
+// When a new node connects to the server, the Chat method is invoked.
 func (s *Bully) Chat(stream proto.Bully_ChatServer) error {
 	s.mu.Lock()
 	newNodeId := s.nodeId
 	s.nodeId++
+	//s.nodes[newNodeId] = stream stores the stream in the s.nodes map with newNodeId as the key.
 	s.nodes[newNodeId] = stream
 	s.mu.Unlock()
 
@@ -38,6 +40,7 @@ func (s *Bully) Chat(stream proto.Bully_ChatServer) error {
 	log.Println(joinMessage)
 	s.broadcast(joinMessage)
 
+	//This deferred function will execute when the Chat method returns.
 	defer func() {
 		s.mu.Lock()
 		delete(s.nodes, newNodeId)
@@ -48,6 +51,7 @@ func (s *Bully) Chat(stream proto.Bully_ChatServer) error {
 		s.broadcast(leaveMessage)
 	}()
 
+	//The server continuously receives messages from the stream.
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {
@@ -65,6 +69,7 @@ func (s *Bully) Chat(stream proto.Bully_ChatServer) error {
 
 }
 
+// The main function starts the server and listens on port 8080.
 func main() {
 	lis, err := net.Listen("tcp", ":8080")
 	if err != nil {
